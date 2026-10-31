@@ -91,8 +91,8 @@ Write-Host "All files processed successfully!"
 ## 5. Remove auxiliary CSV files
 
 Inspect the extracted CSV files and remove the small auxiliary files
-whose filenames begin with an underscore (`_`), they are not part of
-the actual dataset, just metadata.
+whose filenames begin with `._`, they are not part of
+the actual dataset, just metadata. I did this manually, you can probably get a script to do this.
 
 ## 6. Organize the datasets by year
 
