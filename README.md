@@ -157,7 +157,7 @@ Make sure that:
 
 ## 9. Update the paths in `import_data.ipynb`
 
-Open `import_data.ipynb`.
+Open `import_data.ipynb`. At this point you should also create and activate a python venv or a conda environment and install the packages that are used in this file (duckdb, pandas, glob, ipykernel). 
 
 Use `Ctrl + F` to search for:
 
