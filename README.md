@@ -1,13 +1,8 @@
 # Divvy Bike-Share Data: Downloading, Pre-processing, and Importing
 
-This guide explains how to download the Divvy trip-data archives,
-organize the CSV files, and combine the historical and modern datasets
-into a unified DuckDB database and Parquet file.
+This guide explains how to download the Divvy trip-data archives and combine the historical and modern datasets into a unified DuckDB database and Parquet file.
 
-> **Before you start:** The commands below use Windows PowerShell.
-> Replace the example paths with the path on your own computer. Keep a
-> backup of the original downloads until you have verified the processed
-> dataset.
+> **Before you start:** The commands below use Windows PowerShell. If you're not on Windows ask an LLM to give you the equivalent installation guide.
 
 ## 1. Create the project folders
 
@@ -30,7 +25,7 @@ winget install Amazon.AWSCLI
 ```
 
 If PowerShell was already open during installation, open a new
-PowerShell window so that the `aws` command is available.
+PowerShell window so that the `aws` command is available (I forgot this initially, this is important).
 
 You can check the installation with:
 
@@ -52,9 +47,6 @@ For example:
 ``` powershell
 aws s3 sync s3://divvy-tripdata "C:\Users\vanoi\Downloads\ADA Project\Dataset" --exclude "*" --include "*.zip" --no-sign-request
 ```
-
-This downloads ZIP files from the public Divvy trip-data S3 bucket
-without requiring AWS credentials.
 
 ## 4. Extract the ZIP files
 
@@ -96,19 +88,11 @@ foreach ($zip in $zipFiles) {
 Write-Host "All files processed successfully!"
 ```
 
-**Important:** This script deletes the ZIP archives after extraction and
-overwrites files with matching names. Make sure you are happy with the
-extracted files before running it, and consider keeping a backup of the
-original archives.
-
 ## 5. Remove auxiliary CSV files
 
 Inspect the extracted CSV files and remove the small auxiliary files
-whose filenames begin with an underscore (`_`), if they are not part of
-the actual dataset.
-
-Do not delete files based on their size or filename alone without
-checking that they are auxiliary files.
+whose filenames begin with an underscore (`_`), they are not part of
+the actual dataset, just metadata.
 
 ## 6. Organize the datasets by year
 
@@ -217,13 +201,8 @@ The processing time depends on your computer and the size of the
 downloaded dataset. On my computer, it took approximately **5 minutes
 and 30 seconds**.
 
-The notebook:
-
-1.  Builds a master station table using historical station coordinates.
-2.  Standardizes the column names and membership categories in the
-    pre-2020 trip data.
-3.  Adds the post-2020 trip data to the same unified table.
-4.  Exports the combined dataset.
+The notebook standardizes the column names and membership categories in the 
+pre-2020 trip data, and then combines it with the post-2020 trip data.
 
 When processing finishes, it should create:
 
@@ -305,7 +284,7 @@ print(f"Total Row Count: {row_count:,}")
 con.close()
 ```
 
-### Option C: Load the Parquet file into Pandas
+### Option C: Load the Parquet file into Pandas (if you have more than like 32GB of RAM)
 
 If your computer has enough available memory, you can load the entire
 Parquet dataset into a Pandas DataFrame:
@@ -316,27 +295,6 @@ import pandas as pd
 df = pd.read_parquet("bikeshare_dataset.parquet")
 ```
 
-**Note:** More than 32 GB of RAM may make this more practical, but it is
-not a guarantee. Actual memory requirements depend on the dataset size,
-data types, and other programs running on your computer. DuckDB is
-generally the safer option for large datasets.
-
 ------------------------------------------------------------------------
 
-## 12. Final checks
-
-Before using the dataset for analysis, I recommend checking:
-
--   [ ] The number of CSV files in each folder is as expected.
--   [ ] The combined dataset has a nonzero row count.
--   [ ] The resulting table has all 13 expected columns.
--   [ ] The `started_at` and `ended_at` columns contain valid
-    timestamps.
--   [ ] The `ride_id` column does not contain unexpected duplicates.
--   [ ] The `member_casual` column contains the expected categories
-    (`member` and `casual`).
--   [ ] Latitude and longitude values are within valid geographic
-    ranges.
--   [ ] Missing station coordinates are understood and documented.
-
-That's it! Thanks for reading, and good luck with the project.
+That's it, thanks for reading!
